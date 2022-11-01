@@ -20,7 +20,7 @@ const promptMain = () => {
             type: 'list',
             name: 'name',
             message: 'What can I do for you?',
-            choices: ['View all Departments', 'View all roles', 'View all Employees', 'Add a department', 'Add a role', 'Add an Employee', 'Update an Employee'],
+            choices: ['View all Departments', 'View all roles', 'View all Employees', 'Add a department', 'Add a role', 'Add an Employee', 'Update an Employee', 'Quit'],
         },
     ])
         .then((choice) => {
@@ -46,6 +46,8 @@ const promptMain = () => {
                 case 'Update an Employee':
                     updateEmployee();
                     break;
+                case 'Quit':
+                    process.exit();
                 default:
                     console.log('Did not match any cases')
             }
@@ -58,8 +60,10 @@ const viewDepts = () => {
             console.log(err)
             return;
         }
-        console.log("\n")
+        console.log("\n");
         console.table(rows);
+        console.log("\n");
+
     });
     inquirer.prompt([
         {
@@ -89,9 +93,24 @@ const viewRoles = () => {
         }
         console.log("\n");
         console.table(res);
-    });
-
-    promptMain();
+    })
+    inquirer.prompt([
+        {
+            type: 'list',
+            name: 'name',
+            message: 'What would you like to do?',
+            choices: ['Return to main menu', 'Quit']
+        },
+    ])
+        .then((choice) => {
+            switch (choice.name) {
+                case 'Return to main menu':
+                    promptMain();
+                    break;
+                case 'Quit':
+                    process.exit();
+            }
+        })
 }
 const viewEmployees = () => {
     const sql = 'SELECT * FROM employees';
