@@ -123,8 +123,23 @@ const viewEmployees = () => {
             console.table(res);
         }
     });
-
-    promptMain();
+    inquirer.prompt([
+        {
+            type: 'list',
+            name: 'name',
+            message: 'What would you like to do?',
+            choices: ['Return to main menu', 'Quit']
+        },
+    ])
+        .then((choice) => {
+            switch (choice.name) {
+                case 'Return to main menu':
+                    promptMain();
+                    break;
+                case 'Quit':
+                    process.exit();
+            }
+        })
 }
 const addDept = () => {
     inquirer.prompt([
@@ -137,15 +152,34 @@ const addDept = () => {
         .then((response) => {
             const deptName = response;
             const sql = `INSERT INTO departments SET ?`;
-            console.log(deptName)
             db.query(sql, deptName, (err, result) => {
                 if (err) {
                     console.log(err)
                 } else {
-                    console.log("Department Added!")
+                    console.log("\n");
+                    console.log(`${response.name} added to Departments!`);
+                    console.log("\n");
                 }
             })
+            inquirer.prompt([
+                {
+                    type: 'list',
+                    name: 'name',
+                    message: 'What would you like to do?',
+                    choices: ['Return to main menu', 'Quit']
+                },
+            ])
+                .then((choice) => {
+                    switch (choice.name) {
+                        case 'Return to main menu':
+                            promptMain();
+                            break;
+                        case 'Quit':
+                            process.exit();
+                    }
+                })
         })
+        
 }
 const addRole = () => {
     inquirer.prompt([
