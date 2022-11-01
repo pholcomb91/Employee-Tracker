@@ -11,7 +11,8 @@ const db = mysql.createConnection(
         password: '',
         database: 'employees_db'
     },
-    console.log(`Connected to the employees_db database.`)
+    console.log(`Connected to the employees_db database.`),
+    console.log("\n"),
 );
 
 const promptMain = () => {
@@ -206,12 +207,30 @@ const addRole = () => {
                 if (err) {
                     console.log(err);
                 } else {
+                    console.log("\n");
                     console.log(`You have successfully added ${response.title} into Roles`)
-
+                    console.log("\n");
                 }
             });
+            inquirer.prompt([
+                {
+                    type: 'list',
+                    name: 'name',
+                    message: 'What would you like to do?',
+                    choices: ['Return to main menu', 'Quit']
+                },
+            ])
+                .then((choice) => {
+                    switch (choice.name) {
+                        case 'Return to main menu':
+                            promptMain();
+                            break;
+                        case 'Quit':
+                            process.exit();
+                    }
+                })
         });
-    promptMain();
+    
 }
 
 const addEmployee = () => {
@@ -245,8 +264,6 @@ const addEmployee = () => {
                 ).then(resRole => {
                     var empRole = resRole.role_id;
                     newEmployee.role_id= empRole;
-                    console.log(newEmployee);
-                
                     const sql2 = 'SELECT * FROM employees'
                     db.query(sql2, (err, returnEmps) => {
                         if (err) {
@@ -256,6 +273,7 @@ const addEmployee = () => {
                         console.log("\n");
                         console.table(returnEmps);
                     })
+
                         inquirer.prompt(
                             {
                                 type: "input",
@@ -264,17 +282,34 @@ const addEmployee = () => {
                             }
                         ).then(resMan => { //resMan = responseManager
                             var empMan = resMan.manager_id;
-                            console.log(empMan);
                             newEmployee.manager_id = empMan;
-                            console.log(newEmployee);
                             const sql = 'INSERT INTO employees SET ?';
                             db.query(sql, newEmployee, (err, result) => {
                                 if (err) {
                                     console.log(err);
                                 } 
+                                console.log("\n");
                                 console.log(`Success! ${newEmployee.first_name} has been added to your employees!`);
-                                
+                                console.log("\n");
                             });
+                        }).then(() => {
+                            inquirer.prompt([
+                                {
+                                    type: 'list',
+                                    name: 'name',
+                                    message: 'What would you like to do?',
+                                    choices: ['Return to main menu', 'Quit']
+                                },
+                            ])
+                                .then((choice) => {
+                                    switch (choice.name) {
+                                        case 'Return to main menu':
+                                            promptMain();
+                                            break;
+                                        case 'Quit':
+                                            process.exit();
+                                    }
+                                })
                         })
                         
 
