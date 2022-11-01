@@ -200,27 +200,26 @@ const addEmployee = () => {
                             console.log(err);
                             return;
                         }
-                        var manager = returnEmps.map((employee) => (
-                            {  name: `${employee.first_name} ${employee.last_name}`, employee_id: `${employee.id}` }
-                        ))
-                        console.log("manager", manager);
+                        console.log("\n");
+                        console.table(returnEmps);
+                    })
                         inquirer.prompt(
                             {
-                                type: "list",
+                                type: "input",
                                 name: "manager_id",
-                                message: "Who will be their manager?",
-                                choices: manager,
+                                message: "What is ID of their manager?",
                             }
                         ).then(resMan => { //resMan = responseManager
-                            console.log(resMan);
-                            newEmployee2.manager_id = resMan.employee_id;
-                            console.log(newEmployee2);
+                            var empMan = resMan.manager_id;
+                            console.log(empMan);
+                            newEmployee.manager_id = empMan;
+                            console.log(newEmployee);
                             const sql = 'INSERT INTO employees SET ?';
-                            db.query(sql, newEmployee2, (err, result) => {
+                            db.query(sql, newEmployee, (err, result) => {
                                 if (err) {
                                     console.log(err);
                                 } 
-                                console.log(`Success! ${newEmployee2.first_name} has been added to your employees!`);
+                                console.log(`Success! ${newEmployee.first_name} has been added to your employees!`);
                                 
                             });
                         })
@@ -229,8 +228,8 @@ const addEmployee = () => {
                     })
                 })
                 
-            })
         })
+        
 }
 const updateEmployee = () => {
     inquirer.prompt([
