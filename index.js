@@ -114,7 +114,7 @@ const viewRoles = () => {
         })
 }
 const viewEmployees = () => {
-    const sql = 'SELECT * FROM employees';
+    const sql = 'SELECT * FROM employees JOIN roles ON employees.role_id = roles.id JOIN departments ON roles.department_id = departments.id';
     db.query(sql, (err, res) => {
         if (err) {
             console.log(err);
