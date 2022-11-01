@@ -87,6 +87,7 @@ const viewRoles = () => {
             console.log(err);
             return;
         }
+        console.log("\n");
         console.table(res);
     });
 
@@ -173,62 +174,61 @@ const addEmployee = () => {
             message: "What is the last name of the employee you would like to add?",
         }])
         .then(res => {
-            var newEmployee = res;
+            var newEmployee = { first_name:res.first_name, last_name: res.last_name }
             const sql = 'SELECT * FROM roles'
             db.query(sql, (err, returnRoles) => {
                 if (err) {
                     console.log(err);
                     return;
-                } else {
-                    var roleOptions = returnRoles.map((role) => (
-                        { name: role.title, value: role.id }
-                    ))
-                    console.log("roleOptions", roleOptions);
-                    inquirer.prompt(
-                        {
-                            type: "list",
-                            name: "role_id",
-                            message: "Which Role will they be taking?",
-                            choices: roleOptions,
+                }
+                console.table(returnRoles);
+                console.log("\n");
+                inquirer.prompt(
+                    {
+                        type: "input",
+                        name: "role_id",
+                        message: "Which Role(ID) will they be taking?",
+                    }
+                ).then(resRole => {
+                    var empRole = resRole.role_id;
+                    newEmployee.role_id= empRole;
+                    console.log(newEmployee);
+                
+                    const sql2 = 'SELECT * FROM employees'
+                    db.query(sql2, (err, returnEmps) => {
+                        if (err) {
+                            console.log(err);
+                            return;
                         }
-                        )   
-                        .then(resRole => {
-                            var newEmpRole = resRole;
-                            const sql2 = 'SELECT * FROM employees'
-                            db.query(sql2, (err, returnEmps) => {
+                        var manager = returnEmps.map((employee) => (
+                            {  name: `${employee.first_name} ${employee.last_name}`, employee_id: `${employee.id}` }
+                        ))
+                        console.log("manager", manager);
+                        inquirer.prompt(
+                            {
+                                type: "list",
+                                name: "manager_id",
+                                message: "Who will be their manager?",
+                                choices: manager,
+                            }
+                        ).then(resMan => { //resMan = responseManager
+                            console.log(resMan);
+                            newEmployee2.manager_id = resMan.employee_id;
+                            console.log(newEmployee2);
+                            const sql = 'INSERT INTO employees SET ?';
+                            db.query(sql, newEmployee2, (err, result) => {
                                 if (err) {
                                     console.log(err);
-                                    return;
-                                } else {
-                                    var manager = returnEmps.map((employee) => (
-                                        { name: `${employee.first_name} ${employee.last_name}`, value: employee.id }
-                                    ))
-                                    console.log("manager", manager);
-                                    inquirer.prompt(
-                                        {
-                                            type: "list",
-                                            name: "manager_id",
-                                            message: "Who will be their manager?",
-                                            choices: manager,
-                                        }
-                                    )
-                                        .then(resMan => {
-                                            var newEmployee = resMan;
-                                            const sql = 'INSERT INTO employees SET ?';
-                                            console.log(newEmployee)
-                                            db.query(sql, newEmployee, (err, result) => {
-                                                if (err) {
-                                                    console.log(err);
-                                                } else {
-                                                    console.log(`${first_name} has been added to Employees.`)
-                                                }
-                                            });
-                                        })
-                                }
-
-                            })
+                                } 
+                                console.log(`Success! ${newEmployee2.first_name} has been added to your employees!`);
+                                
+                            });
                         })
-                }
+                        
+
+                    })
+                })
+                
             })
         })
 }
